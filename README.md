@@ -9,7 +9,7 @@ Skills for coding agents (Claude Code, Codex, Cursor and the other agents the [`
 | Skill | What it does |
 |---|---|
 | [`split-dont-scale`](skills/split-dont-scale/SKILL.md) | Routes every implementation ticket to Sonnet and keeps the larger models for planning, splitting, review and orchestration. A ticket that seems to need Opus or `xhigh` is treated as too big: it goes back to be split, never up to a bigger model. |
-| [`foreman`](skills/foreman/SKILL.md) | Takes one feature from idea to pull request: `/ask-matt` picks the route, Matt Pocock's skills run in its order, `split-dont-scale` splits every ticket until Sonnet could build it, and implementers build it on the model the human picks (Opus 5.5 at `high` by default). The foreman asks the human at five gates. |
+| [`foreman`](skills/foreman/SKILL.md) | Takes one feature or one milestone to a pull request: `/ask-matt` picks the route, Matt Pocock's skills run in its order, `split-dont-scale` splits every ticket until Sonnet could build it, and implementers build it on the model the human picks (Opus 5.5 at `high` by default). The foreman asks the human at five gates, and a roll call at the end proves every ticket closed. |
 
 ## Install
 
@@ -34,13 +34,13 @@ It works best alongside [Matt Pocock's skills](https://github.com/mattpocock/ski
 
 ## foreman
 
-Type `/foreman <feature>` in a session on Opus at `high` effort. The skill reads `/ask-matt` fresh on every run and follows its flow; it only fixes where the split and the human's questions sit in it:
+Type `/foreman <feature>`, or `/foreman milestone <name>` for tickets already published, in a session on Opus at `high` effort. The skill reads `/ask-matt` fresh on every run and follows its flow; it only fixes where the split, the human's questions and the roll call sit in it:
 
-1. **Route**: the ordered list of skills for this feature, and the implementers' model (Opus 5.5 `high` by default, Sonnet on request).
-2. **Plan**: `/grill-with-docs`, `/to-spec`, then `/to-tickets` up to its draft, in one context window.
-3. **Split**: the Sonnet test on every drafted ticket, then one table (ticket, blocked by, model and effort, files) before publishing.
+1. **Route**: the ordered list of skills for this feature, or the milestone's open tickets read from the tracker, and the implementers' model (Opus 5.5 `high` by default, Sonnet on request).
+2. **Plan**: `/grill-with-docs`, `/to-spec`, then `/to-tickets` up to its draft, in one context window. A milestone, already ticketed, skips this step.
+3. **Split**: the Sonnet test on every ticket, then one table (ticket, blocked by, model and effort, files) before publishing new tickets or editing a milestone's in place.
 4. **Build**: `/implement-spec`, one implementer per ticket at the chosen model.
-5. **Close**: one review, its fixes, the pull request, `/retro`.
+5. **Close**: one review, its fixes, the pull request, then a roll call on the tracker: every ticket closed or closed by the pull request, with a comment naming its commit and its command, and no open issue left in the milestone. Then `/retro`. After the merge, a second roll call, then the milestone is closed.
 
 It needs `split-dont-scale` and Matt Pocock's skills installed.
 
